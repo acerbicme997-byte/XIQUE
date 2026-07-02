@@ -620,7 +620,7 @@ function renderContentCards() {
         <span style="font-size:11px;color:var(--text2);white-space:nowrap;">📷 推荐配图：</span>
         <div class="match-photos-bar">
           ${showPhotos.map(ph => `
-            <img class="match-photo-thumb" src="xq-photos/${ph.file}" onclick="event.stopPropagation();openPhotoDetail('xq-photos/${ph.file}','${categoryLabels[ph.cat] || '未分类'}','${ph.file}')" title="${categoryLabels[ph.cat] || '未分类'}">
+            <img class="match-photo-thumb" src="${ph.file}" onclick="event.stopPropagation();openPhotoDetail('${ph.file}','${categoryLabels[ph.cat] || '未分类'}','${ph.file}')" title="${categoryLabels[ph.cat] || '未分类'}">
           `).join('')}
           ${matchedPhotos.length > 5 ? `<span style="font-size:11px;color:var(--text2);">+${matchedPhotos.length - 5}张</span>` : ''}
         </div>
@@ -807,7 +807,7 @@ function renderPhotoGrid() {
     html += `
       <div class="photo-item${isSelected ? ' selected' : ''}" onclick="togglePhotoSelect('${ph.file}', event)" data-file="${ph.file}">
         <div class="check-mark">✓</div>
-        <img src="xq-photos/${ph.file}" alt="${ph.cat}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22140%22><rect fill=%22%23333%22 width=%22200%22 height=%22140%22/><text fill=%22%23999%22 x=%22100%22 y=%2270%22 text-anchor=%22middle%22 font-size=%2214%22>图片加载失败</text></svg>'">
+        <img src="${ph.file}" alt="${ph.cat}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22140%22><rect fill=%22%23333%22 width=%22200%22 height=%22140%22/><text fill=%22%23999%22 x=%22100%22 y=%2270%22 text-anchor=%22middle%22 font-size=%2214%22>图片加载失败</text></svg>'">
         <div class="photo-label">
           <div class="cat-row">
             <span>${ph.file.length > 20 ? ph.file.substring(0, 18) + '...' : ph.file.replace('微信图片_', '').replace(/_74.jpg/, '')}</span>
