@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>喜鹊茶馆 AI运营助手</title>
+<style>
+:root {
+  --bg: #1a1a1a;
+  --card: #252525;
+  --border: #333;
+  --text: #e0e0e0;
+  --text2: #999;
+  --accent: #d4a853;
+  --accent2: #c9953a;
+  --green: #4CAF50;
+  --red: #ff5252;
+  --tag-bg: #2a2a2a;
+  --hover: #303030;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header {
+  text-align: center;
+  padding: 40px 20px 30px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+.header h1 { font-size: 28px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+.header .subtitle { font-size: 14px; color: var(--text2); }
+.shop-info-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+}
+.shop-info-bar .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text2); }
+.shop-info-bar .tag .icon { color: var(--accent); }
+.tabs {
+  display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap;
+  background: var(--card); border-radius: 12px; padding: 4px; border: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 10px 20px; border: none; background: transparent;
+  color: var(--text2); font-size: 14px; cursor: pointer; border-radius: 8px;
+  transition: all 0.2s; white-space: nowrap;
+}
+.tab-btn:hover { background: var(--hover); color: var(--text); }
+.tab-btn.active { background: var(--accent); color: #1a1a1a; font-weight: 600; }
+.panel { display: none; }
+.panel.active { display: block; }
+.gen-section { margin-bottom: 24px; }
+.gen-section h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--accent); }
+.quick-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.quick-btn {
+  padding: 8px 16px; border: 1px solid var(--border); background: var(--card);
+  color: var(--text); font-size: 13px; border-radius: 20px; cursor: pointer; transition: all 0.2s;
+}
+.quick-btn:hover { border-color: var(--accent); color: var(--accent); }
+.quick-btn.selected { background: var(--accent); color: #1a1a1a; border-color: var(--accent); font-weight: 600; }
+.platform-tab {
+  padding: 8px 16px; border: 1px solid var(--border); background: var(--card);
+  color: var(--text2); font-size: 13px; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+  font-weight: 500;
+}
+.platform-tab:hover { border-color: var(--accent); color: var(--accent); }
+.platform-tab.active { border-color: var(--accent); color: var(--accent); background: #d4a85311; font-weight: 600; }
+.platform-tab.active.xiaohongshu { border-color: #ff2442; color: #ff2442; background: #ff244211; }
+.platform-tab.active.pengyouquan { border-color: #07c160; color: #07c160; background: #07c16011; }
+.platform-tab.active.meituan { border-color: #ff6b35; color: #ff6b35; background: #ff6b3511; }
+.platform-tab.active.dianping { border-color: #ffb800; color: #ffb800; background: #ffb80011; }
+.platform-tab.active.douyin { border-color: #ff0044; color: #ff0044; background: #ff004411; }
+.content-cards { display: grid; gap: 16px; }
+.content-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; transition: border-color 0.2s;
+}
+.content-card:hover { border-color: var(--accent); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.platform-badge { font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: 500; }
+.platform-badge.meituan { background: #ff6b3522; color: #ff6b35; }
+.platform-badge.dianping { background: #ffb80022; color: #ffb800; }
+.platform-badge.xiaohongshu { background: #ff244222; color: #ff2442; }
+.platform-badge.pengyouquan { background: #07c16022; color: #07c160; }
+.platform-badge.douyin { background: #ff004422; color: #ff0044; }
+.card-body {
+  font-size: 14px; color: var(--text); background: #1a1a1a;
+  padding: 14px 16px; border-radius: 8px; white-space: pre-wrap; line-height: 1.8; min-height: 60px;
+}
+.card-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+.btn {
+  padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px;
+  cursor: pointer; transition: all 0.2s; font-weight: 500;
+}
+.btn-primary { background: var(--accent); color: #1a1a1a; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 16px; }
+.calendar-day {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 10px 8px; min-height: 80px; cursor: pointer; transition: all 0.2s;
+}
+.calendar-day:hover { border-color: var(--accent); }
+.calendar-day .date { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.calendar-day .content-hint { font-size: 11px; color: var(--accent); line-height: 1.5; }
+.calendar-day.today { border-color: var(--accent); background: #d4a85311; }
+.calendar-day.empty { background: transparent; border-color: transparent; }
+.settings-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 24px; margin-bottom: 16px;
+}
+.settings-card h3 { font-size: 15px; margin-bottom: 16px; color: var(--accent); }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.form-group input, .form-group textarea {
+  width: 100%; padding: 10px 14px; background: #1a1a1a; border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 14px; font-family: inherit;
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--green); color: #fff; padding: 10px 24px; border-radius: 8px;
+  font-size: 14px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+.tip-box {
+  background: #d4a85311; border: 1px solid #d4a85333; border-radius: 8px;
+  padding: 14px 18px; margin-top: 16px; font-size: 13px; color: var(--accent); line-height: 1.8;
+}
+
+/* ====== 图片管理面板 ====== */
+.photo-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.photo-filter-btn {
+  padding: 6px 14px; border: 1px solid var(--border); background: var(--card);
+  color: var(--text2); font-size: 12px; border-radius: 16px; cursor: pointer; transition: all 0.2s;
+}
+.photo-filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.photo-filter-btn.active { background: var(--accent); color: #1a1a1a; border-color: var(--accent); font-weight: 600; }
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.photo-item {
+  background: var(--card); border: 2px solid var(--border); border-radius: 10px;
+  overflow: hidden; cursor: pointer; transition: all 0.2s; position: relative;
+}
+.photo-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+.photo-item.selected { border-color: var(--accent); box-shadow: 0 0 0 2px #d4a85344; }
+.photo-item img { width: 100%; height: 140px; object-fit: cover; display: block; }
+.photo-item .photo-label {
+  padding: 6px 10px; font-size: 11px; color: var(--text2); display: flex;
+  flex-direction: column; gap: 4px;
+}
+.photo-item .photo-label .cat-row {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.photo-item .photo-label .cat-tag {
+  font-size: 10px; padding: 1px 6px; border-radius: 8px; background: #d4a85322; color: var(--accent);
+}
+.photo-item .cat-select {
+  width: 100%; padding: 4px 6px; background: #1a1a1a; border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text); font-size: 11px; cursor: pointer; font-family: inherit;
+}
+.photo-item .cat-select:focus { outline: none; border-color: var(--accent); }
+.photo-item .check-mark {
+  position: absolute; top: 8px; right: 8px; width: 22px; height: 22px;
+  background: var(--accent); border-radius: 50%; display: none;
+  align-items: center; justify-content: center; font-size: 12px; color: #1a1a1a; font-weight: bold;
+}
+.photo-item.selected .check-mark { display: flex; }
+.photo-detail-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85); z-index: 999; display: none;
+  align-items: center; justify-content: center; cursor: pointer;
+}
+.photo-detail-overlay.show { display: flex; }
+.photo-detail-overlay img {
+  max-width: 90vw; max-height: 85vh; border-radius: 8px; object-fit: contain;
+}
+.photo-detail-overlay .close-btn {
+  position: absolute; top: 20px; right: 30px; font-size: 32px; color: #fff;
+  cursor: pointer; background: none; border: none;
+}
+.photo-detail-overlay .detail-info {
+  position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: #252525; padding: 10px 24px; border-radius: 20px; font-size: 13px; color: var(--text);
+  display: flex; align-items: center; gap: 10px;
+}
+.photo-detail-overlay .detail-select {
+  padding: 4px 10px; background: #1a1a1a; border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text); font-size: 12px; cursor: pointer; font-family: inherit;
+}
+.photo-detail-overlay .detail-select:focus { outline: none; border-color: var(--accent); }
+.match-photos-bar {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+}
+.match-photo-thumb {
+  width: 60px; height: 45px; border-radius: 6px; object-fit: cover;
+  border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;
+}
+.match-photo-thumb:hover { border-color: var(--accent); }
+.stats-bar {
+  display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.stat-item {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 18px; text-align: center; min-width: 100px;
+}
+.stat-item .stat-num { font-size: 24px; font-weight: 600; color: var(--accent); }
+.stat-item .stat-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: 12px; padding: 40px 20px;
+  text-align: center; cursor: pointer; transition: all 0.2s; margin-top: 16px;
+}
+.upload-zone:hover { border-color: var(--accent); background: #d4a85308; }
+.upload-zone p { font-size: 14px; color: var(--text2); margin-bottom: 8px; }
+.upload-zone .icon-big { font-size: 36px; margin-bottom: 8px; }
+@media (max-width: 768px) {
+  .calendar-grid { grid-template-columns: repeat(7, 1fr); }
+  .calendar-day { min-height: 50px; padding: 6px 4px; }
+  .calendar-day .content-hint { font-size: 10px; }
+  .tabs { gap: 2px; }
+  .tab-btn { padding: 8px 12px; font-size: 12px; }
+  .photo-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .photo-item img { height: 100px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>喜鹊茶馆 AI运营助手</h1>
+    <p class="subtitle">文案生成 + 实拍照片管理 + 智能匹配，一站式运营</p>
+  </div>
+
+  <div class="shop-info-bar" id="shopInfoBar">
+    <span class="tag"><span class="icon">📍</span> 厦门翔安·金海街道淞源里10-103号</span>
+    <span class="tag"><span class="icon">🕐</span> 24小时营业（根据客户需求）</span>
+    <span class="tag"><span class="icon">🅿️</span> 路边公共停车位·免费</span>
+    <span class="tag"><span class="icon">📞</span> 18030105880</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('generate', this)">📝 生成内容</button>
+    <button class="tab-btn" onclick="switchTab('photos', this)">📷 图片管理</button>
+    <button class="tab-btn" onclick="switchTab('calendar', this)">📅 运营日历</button>
+    <button class="tab-btn" onclick="switchTab('templates', this)">📋 模板库</button>
+    <button class="tab-btn" onclick="switchTab('settings', this)">⚙️ 设置</button>
+  </div>
+
+  <!-- ====== 内容生成面板 ====== -->
+  <div id="panel-generate" class="panel active">
+    <div class="gen-section">
+      <h2>快速场景选择</h2>
+      <div class="quick-actions" id="sceneTags">
+        <button class="quick-btn selected" onclick="selectScene(this, 'daily')">☀️ 日常揽客</button>
+        <button class="quick-btn" onclick="selectScene(this, 'weekend')">🎉 周末促销</button>
+        <button class="quick-btn" onclick="selectScene(this, 'new')">🆕 新客引流</button>
+        <button class="quick-btn" onclick="selectScene(this, 'old')">💎 老客维护</button>
+        <button class="quick-btn" onclick="selectScene(this, 'event')">🎊 节日活动</button>
+        <button class="quick-btn" onclick="selectScene(this, 'weather')">🌧️ 天气借势</button>
+        <button class="quick-btn" onclick="selectScene(this, 'show')">📸 环境展示</button>
+      </div>
+    </div>
+
+    <!-- 平台子标签 -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:13px;color:var(--text2);margin-right:8px;">发布平台：</span>
+      <button class="platform-tab active" onclick="selectPlatform('xiaohongshu', this)">🔴 小红书</button>
+      <button class="platform-tab" onclick="selectPlatform('pengyouquan', this)">🟢 朋友圈</button>
+      <button class="platform-tab" onclick="selectPlatform('meituan', this)">🟠 美团</button>
+      <button class="platform-tab" onclick="selectPlatform('dianping', this)">🟡 大众点评</button>
+      <button class="platform-tab" onclick="selectPlatform('douyin', this)">🔵 抖音</button>
+      <span style="flex:1;"></span>
+      <button class="btn btn-outline btn-sm" onclick="regenerateCurrentPlatform()">🔄 换一条</button>
+      <button class="btn btn-primary btn-sm" onclick="generateAllPlatforms()">🚀 全部生成</button>
+    </div>
+
+    <div class="content-cards" id="contentCards"></div>
+
+    <!-- 全部平台预览区 -->
+    <div style="margin-top:30px;">
+      <h2 style="font-size:16px;color:var(--accent);margin-bottom:12px;cursor:pointer;" onclick="toggleAllPreview()">
+        📋 全部平台预览 <span style="font-size:12px;color:var(--text2);" id="allPreviewToggle">（点击展开）</span>
+      </h2>
+      <div id="allPlatformPreview" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ====== 图片管理面板 ====== -->
+  <div id="panel-photos" class="panel">
+    <div class="gen-section">
+      <h2>📷 实拍照片管理</h2>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">
+        管理你的实拍照片，按场景分类，生成内容时自动推荐匹配照片
+      </p>
+
+      <div class="stats-bar" id="photoStats"></div>
+
+      <div class="photo-toolbar">
+        <span style="font-size:13px;color:var(--text2);margin-right:8px;">筛选：</span>
+        <button class="photo-filter-btn active" onclick="filterPhotos('all', this)">全部</button>
+        <button class="photo-filter-btn" onclick="filterPhotos('room', this)">🏠 包间环境</button>
+        <button class="photo-filter-btn" onclick="filterPhotos('table', this)">🀄 麻将桌</button>
+        <button class="photo-filter-btn" onclick="filterPhotos('window', this)">🪟 大窗</button>
+        <button class="photo-filter-btn" onclick="filterPhotos('corridor', this)">🚪 走廊</button>
+        <button class="photo-filter-btn" onclick="filterPhotos('front', this)">🏢 前台</button>
+        <button class="photo-filter-btn" onclick="filterPhotos('uncat', this)">❓ 未分类</button>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-outline btn-sm" onclick="selectAllPhotos()">☑️ 全选</button>
+        <button class="btn btn-outline btn-sm" onclick="deselectAllPhotos()">⬜ 取消全选</button>
+        <span style="font-size:12px;color:var(--text2);margin-left:4px;" id="selectedCount">已选 0 张</span>
+        <span style="flex:1;"></span>
+        <span style="font-size:11px;color:var(--text2);">批量改分类：</span>
+        <select id="batchCatSelect" onchange="batchChangeCategory(this.value)" style="padding:6px 10px;background:#1a1a1a;border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;cursor:pointer;">
+          <option value="">-- 选择分类 --</option>
+          <option value="room">🏠 包间环境</option>
+          <option value="table">🀄 麻将桌</option>
+          <option value="window">🪟 大窗</option>
+          <option value="corridor">🚪 走廊</option>
+          <option value="front">🏢 前台</option>
+        </select>
+      </div>
+
+      <div class="photo-grid" id="photoGrid"></div>
+
+      <div class="upload-zone" id="uploadZone">
+        <div class="icon-big">📁</div>
+        <p>拖拽照片到这里，或点击上传</p>
+        <p style="font-size:12px;color:var(--text2);">支持 JPG/PNG/WebP，上传后自动加入照片库</p>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none;">
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== 运营日历面板 ====== -->
+  <div id="panel-calendar" class="panel">
+    <div class="gen-section">
+      <h2>7月运营日历</h2>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:16px;">
+        点击日期可生成当天专属内容 | 当前月份：2026年7月
+      </p>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+  </div>
+
+  <!-- ====== 模板库面板 ====== -->
+  <div id="panel-templates" class="panel">
+    <div class="settings-card">
+      <h3>📋 精选文案模板库</h3>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:16px;">按场景分类的优质文案，可直接使用或作为灵感参考</p>
+      <div id="templateList"></div>
+    </div>
+  </div>
+
+  <!-- ====== 设置面板 ====== -->
+  <div id="panel-settings" class="panel">
+    <div class="settings-card">
+      <h3>⚙️ 店铺信息设置</h3>
+      <div class="form-group">
+        <label>店铺名称</label>
+        <input type="text" id="shopName" value="喜鹊茶馆">
+      </div>
+      <div class="form-group">
+        <label>所在城市/区域</label>
+        <input type="text" id="shopLocation" value="厦门翔安">
+      </div>
+      <div class="form-group">
+        <label>店铺特色（逗号分隔）</label>
+        <input type="text" id="shopFeatures" value="独立包间,24小时营业,免费停车,设备和麻将新,服务好">
+      </div>
+      <div class="form-group">
+        <label>地址</label>
+        <input type="text" id="shopAddress" value="金海街道淞源里10-103号（国贸沁原1期东门）">
+      </div>
+      <div class="form-group">
+        <label>营业时间</label>
+        <input type="text" id="shopHours" value="24小时（根据客户需求）">
+      </div>
+      <div class="form-group">
+        <label>联系电话</label>
+        <input type="text" id="shopPhone" value="18030105880">
+      </div>
+      <div class="form-group">
+        <label>自定义活动信息（会融入生成的文案）</label>
+        <textarea id="customEvent" placeholder="例如：新客首单半价、转发朋友圈送茶水、周二会员日8折"></textarea>
+      </div>
+      <div class="form-group">
+        <label>照片文件夹路径（用于读取实拍照片）</label>
+        <input type="text" id="photoFolder" placeholder="例如：E:\【yy】\XQ">
+        <p style="font-size:11px;color:var(--text2);margin-top:4px;">注意：浏览器无法直接读取本地文件夹，请通过下方上传区域导入照片，或在生成内容时手动选择。</p>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()">💾 保存设置</button>
+    </div>
+
+    <div class="tip-box">
+      <strong>💡 使用建议</strong><br>
+      1. 先在「图片管理」面板上传实拍照片并分类<br>
+      2. 切换到「生成内容」，选场景后生成文案<br>
+      3. 每条文案下方会自动推荐匹配的照片<br>
+      4. 复制文案 + 下载推荐照片 → 发布到各平台<br>
+      5. 建议发布频率：美团每天1条 + 小红书每周3条 + 朋友圈每天1条
+    </div>
+  </div>
+</div>
+
+<!-- 大图预览 -->
+<div class="photo-detail-overlay" id="photoOverlay" onclick="closePhotoDetail()">
+  <button class="close-btn">&times;</button>
+  <img id="photoDetailImg" src="" alt="" onclick="event.stopPropagation()">
+  <div class="detail-info" id="photoDetailInfo" onclick="event.stopPropagation()"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== 核心数据 ======
+let currentScene = 'daily';
+let currentPlatform = 'xiaohongshu';
+let currentContent = {};
+let allContent = {};
+let currentPhotoFilter = 'all';
+let selectedPhotos = new Set();
+
+const shopInfo = {
+  name: '喜鹊茶馆',
+  location: '厦门翔安',
+  features: ['独立包间', '24小时营业', '免费停车', '设备和麻将新', '服务好', '路边公共停车位'],
+  hours: '24小时（根据客户需求）',
+  address: '金海街道淞源里10-103号（国贸沁原1期东门）',
+  phone: '18030105880',
+  customEvent: ''
+};
+
+// ====== 照片数据 ======
+const photoCategories = ['room', 'table', 'window', 'corridor', 'front'];
+const categoryLabels = {
+  room: '🏠 包间环境',
+  table: '🀄 麻将桌',
+  window: '🪟 大窗',
+  corridor: '🚪 走廊',
+  front: '🏢 前台',
+  uncat: '❓ 未分类'
+};
+
+// 预置照片列表（你的实拍）
+const presetPhotos = [
+  { file: 's.jpg', cat: 'front' },
+  { file: '微信图片_20260701161039_411_74.jpg', cat: 'room' },
+  { file: '微信图片_20260701161041_412_74.jpg', cat: 'room' },
+  { file: '微信图片_20260701161043_413_74.jpg', cat: 'table' },
+  { file: '微信图片_20260701161045_414_74.jpg', cat: 'window' },
+  { file: '微信图片_20260701161047_415_74.jpg', cat: 'room' },
+  { file: '微信图片_20260701161049_416_74.jpg', cat: 'corridor' },
+  { file: '微信图片_20260701161050_417_74.jpg', cat: 'room' },
+  { file: '微信图片_20260701161052_418_74.jpg', cat: 'table' },
+  { file: '微信图片_20260701161054_419_74.jpg', cat: 'window' },
+  { file: '微信图片_20260701161056_420_74.jpg', cat: 'corridor' },
+  { file: '微信图片_20260701161058_421_74.jpg', cat: 'room' },
+  { file: '微信图片_20260701161059_422_74.jpg', cat: 'table' },
+  { file: '微信图片_20260701161101_423_74.jpg', cat: 'window' },
+  { file: '微信图片_20260701161103_424_74.jpg', cat: 'front' },
+  { file: '微信图片_20260701161107_425_74.jpg', cat: 'corridor' },
+  { file: '微信图片_20260701161110_427_74.jpg', cat: 'room' },
+  { file: '微信图片_20260701161112_428_74.jpg', cat: 'table' },
+  { file: '微信图片_20260701161114_429_74.jpg', cat: 'window' },
+  { file: '微信图片_20260701161116_430_74.jpg', cat: 'corridor' },
+  { file: '微信图片_20260701161117_431_74.jpg', cat: 'front' }
+];
+
+// 从localStorage读取照片数据（支持用户自定义分类）
+function getPhotos() {
+  const saved = localStorage.getItem('xiQue_photos');
+  if (saved) {
+    try { return JSON.parse(saved); } catch(e) {}
+  }
+  return presetPhotos.map(p => ({...p}));
+}
+
+function savePhotos(photos) {
+  localStorage.setItem('xiQue_photos', JSON.stringify(photos));
+}
+
+// ====== 场景与照片的匹配规则 ======
+const scenePhotoMapping = {
+  daily: ['room', 'table'],
+  weekend: ['room', 'table', 'corridor'],
+  new: ['room', 'front', 'window'],
+  old: ['room', 'corridor'],
+  event: ['room', 'front', 'corridor'],
+  weather: ['window', 'room'],
+  show: ['room', 'table', 'window', 'corridor', 'front']
+};
+
+// ====== 文案生成引擎 ======
+const sceneConfig = {
+  daily: {
+    label: '日常揽客',
+    keywords: ['舒适', '放松', '聚会', '休闲'],
+    tone: '轻松亲切',
+    angles: ['下班后放松好去处', '朋友聚会首选', '周末约牌好地方', '炎炎夏日清凉搓麻']
+  },
+  weekend: {
+    label: '周末促销',
+    keywords: ['周末', '优惠', '预订', '包间'],
+    tone: '热情促销',
+    angles: ['周末包间紧张速订', '周末特惠活动', '闺蜜/兄弟周末局', '周末畅打套餐']
+  },
+  new: {
+    label: '新客引流',
+    keywords: ['新客', '首单', '体验', '优惠'],
+    tone: '亲切引导',
+    angles: ['第一次来不用紧张', '新客体验价', '不会打也没关系', '新客专享福利']
+  },
+  old: {
+    label: '老客维护',
+    keywords: ['老顾客', '感恩', '回馈', '会员'],
+    tone: '温暖感恩',
+    angles: ['感谢一直以来的支持', '老客专属福利', '会员日特惠', '老朋友新惊喜']
+  },
+  event: {
+    label: '节日活动',
+    keywords: ['节日', '活动', '福利', '氛围'],
+    tone: '节日氛围',
+    angles: ['节日不打烊', '节日特惠活动', '过节来搓一把', '节日专属福利']
+  },
+  weather: {
+    label: '天气借势',
+    keywords: ['天气', '凉爽', '舒适', '室内'],
+    tone: '应景自然',
+    angles: ['外面太热来搓麻', '下雨天的最佳选择', '空调包间舒适搓麻', '厦门夏天的最佳去处']
+  },
+  show: {
+    label: '环境展示',
+    keywords: ['环境', '包间', '设备', '干净'],
+    tone: '自信展示',
+    angles: ['看看我们的包间环境', '全新麻将设备', '干净整洁的包间', '免费停车超方便']
+  }
+};
+
+const platformStyles = {
+  meituan: { name: '美团', icon: '🟠', badgeClass: 'meituan', style: '实用导向，突出位置、停车、环境，带关键词标签' },
+  dianping: { name: '大众点评', icon: '🟡', badgeClass: 'dianping', style: '真实体验感，像顾客写的评价语气' },
+  xiaohongshu: { name: '小红书', icon: '🔴', badgeClass: 'xiaohongshu', style: '种草风，多分段多emoji，年轻化表达 ⚠️纯种草不引流' },
+  pengyouquan: { name: '朋友圈', icon: '🟢', badgeClass: 'pengyouquan', style: '像朋友推荐，亲切自然不硬广' },
+  douyin: { name: '抖音', icon: '🔵', badgeClass: 'douyin', style: '短视频文案风格，有钩子有引导' }
+};
+
+function generateContent(scene, platform) {
+  const cfg = sceneConfig[scene];
+  const angle = cfg.angles[Math.floor(Math.random() * cfg.angles.length)];
+  const eventText = shopInfo.customEvent ? `【当前活动：${shopInfo.customEvent}】` : '';
+  let content = '';
+  const addr = shopInfo.address || '翔安';
+  const parkingNote = '路边公共停车位，免费停车';
+
+  switch(platform) {
+    case 'meituan':
+      content = `🎯 ${angle}\n\n📍 ${shopInfo.name}\n${addr}\n\n✨ 店铺亮点：\n• ${shopInfo.features.filter(f => !f.includes('停车')).join('\n• ')}\n• ${parkingNote}\n\n🕐 营业时间：${shopInfo.hours}\n${eventText}\n\n${shopInfo.features[0]}、${shopInfo.features[3]}——棋牌好去处，就在${shopInfo.name}！`;
+      if (shopInfo.phone) content += `\n\n📞 预约电话：${shopInfo.phone}`;
+      break;
+    case 'dianping':
+      content = `【${angle}——${shopInfo.name}真实体验】\n\n朋友推荐的这家${shopInfo.location}的棋牌室，来了一次就爱上了！\n\n🍃 环境是真的好，独立包间，私密安静，完全不会被打扰。\n🀄 ${shopInfo.features[3]}，手感超棒。\n🅿️ ${parkingNote}，这在翔安太难得了。\n💁 ${shopInfo.features[4]}也很好，茶水及时续，体验感拉满。\n🕐 ${shopInfo.hours}，随时来都能搓。\n\n📍 ${addr}\n${eventText}\n\n强烈推荐给${angle.includes('朋友') ? '想约牌' : '找棋牌室'}的朋友们！`;
+      break;
+    case 'xiaohongshu':
+      content = `🏠 ${shopInfo.location}发现一家宝藏棋牌室！\n\n姐妹们！！翔安这家棋牌室也太舒服了吧😭\n\n✨ 独立包间\n私密性满分，跟闺蜜约牌再也不用担心被打扰\n\n🀄 ${shopInfo.features[3]}\n手感和音效都很舒服，不是那种旧旧的麻将\n\n🅿️ ${parkingNote}\n路边直接停，完全不用找车位\n\n🕐 ${shopInfo.hours}\n随时来都能打，夜猫子友好\n\n💁 ${shopInfo.features[4]}，体验感真的很好\n\n${eventText}\n\n📍 翔安·${shopInfo.name}\n（国贸沁原1期东门附近）\n\n#厦门棋牌室 #翔安棋牌室 #厦门麻将 #周末去哪儿 #厦门探店 #棋牌室推荐 #${shopInfo.name}`;
+      break;
+    case 'pengyouquan':
+      content = `最近发现一家很不错的棋牌室——${shopInfo.name}\n\n在${shopInfo.location}，${addr}。\n${shopInfo.features.filter(f => !f.includes('停车')).slice(0,3).join('、')}。\n\n关键是${parkingNote}，开车来很方便。环境也舒服，独立包间私密安静。\n\n🕐 ${shopInfo.hours}\n📞 ${shopInfo.phone}\n\n${eventText || '有兴趣的朋友可以约一波~'}`;
+      break;
+    case 'douyin':
+      content = `在${shopInfo.location}找到一家超舒服的棋牌室！\n\n独立包间 ✨\n${parkingNote} 🅿️\n${shopInfo.features[3]} 🀄\n${shopInfo.hours} 🕐\n\n${eventText ? eventText + '\n\n' : ''}📍 ${shopInfo.name}\n${addr}\n📞 ${shopInfo.phone}\n\n❤️ 点赞收藏，下次约牌用得上！\n\n#厦门棋牌 #翔安棋牌 #麻将 #棋牌室`;
+      break;
+  }
+  return content;
+}
+
+// ====== 获取当前场景推荐的匹配照片 ======
+function getMatchedPhotos() {
+  const photos = getPhotos();
+  const cats = scenePhotoMapping[currentScene] || ['room'];
+  return photos.filter(p => cats.includes(p.cat));
+}
+
+// ====== 渲染当前平台的内容卡片 ======
+function renderContentCards() {
+  const container = document.getElementById('contentCards');
+  const matchedPhotos = getMatchedPhotos();
+
+  // 为所有平台生成内容
+  const platforms = ['xiaohongshu', 'pengyouquan', 'meituan', 'dianping', 'douyin'];
+  platforms.forEach(p => {
+    allContent[p] = generateContent(currentScene, p);
+  });
+  currentContent[currentPlatform] = allContent[currentPlatform];
+
+  const content = allContent[currentPlatform];
+  const pStyle = platformStyles[currentPlatform];
+
+  let photoBarHTML = '';
+  if (matchedPhotos.length > 0) {
+    const showPhotos = matchedPhotos.slice(0, 5);
+    photoBarHTML = `
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--text2);white-space:nowrap;">📷 推荐配图：</span>
+        <div class="match-photos-bar">
+          ${showPhotos.map(ph => `
+            <img class="match-photo-thumb" src="xq-photos/${ph.file}" onclick="event.stopPropagation();openPhotoDetail('xq-photos/${ph.file}','${categoryLabels[ph.cat] || '未分类'}','${ph.file}')" title="${categoryLabels[ph.cat] || '未分类'}">
+          `).join('')}
+          ${matchedPhotos.length > 5 ? `<span style="font-size:11px;color:var(--text2);">+${matchedPhotos.length - 5}张</span>` : ''}
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();switchTab('photos', document.querySelector('.tab-btn:nth-child(2)'))" style="font-size:11px;">管理照片</button>
+      </div>`;
+  }
+
+  container.innerHTML = `
+    <div class="content-card">
+      <div class="card-header">
+        <span class="platform-badge ${pStyle.badgeClass}">${pStyle.icon} ${pStyle.name}文案</span>
+        <span style="font-size:12px;color:var(--text2);">${pStyle.style}</span>
+      </div>
+      <div class="card-body">${content}</div>
+      ${photoBarHTML}
+      <div class="card-actions">
+        <button class="btn btn-primary btn-sm" onclick="copyCurrentPlatform()">📋 复制文案</button>
+        <button class="btn btn-outline btn-sm" onclick="regenerateCurrentPlatform()">🔄 换一条</button>
+      </div>
+    </div>`;
+
+  // 同步更新全部预览
+  updateAllPreview();
+}
+
+// ====== 全部平台预览 ======
+function updateAllPreview() {
+  const container = document.getElementById('allPlatformPreview');
+  if (container.style.display === 'none') return;
+  const platforms = ['xiaohongshu', 'pengyouquan', 'meituan', 'dianping', 'douyin'];
+  const matchedPhotos = getMatchedPhotos();
+  let html = '';
+  platforms.forEach(p => {
+    const pStyle = platformStyles[p];
+    const content = allContent[p] || '';
+    html += `
+      <div class="content-card" style="margin-bottom:12px;">
+        <div class="card-header">
+          <span class="platform-badge ${pStyle.badgeClass}">${pStyle.icon} ${pStyle.name}</span>
+          <span style="font-size:12px;color:var(--text2);">${pStyle.style}</span>
+        </div>
+        <div class="card-body">${content}</div>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-sm" onclick="copyAllPlatform('${p}')">📋 复制</button>
+          <button class="btn btn-outline btn-sm" onclick="selectPlatform('${p}', document.querySelector('.platform-tab[onclick*=\"${p}\"]'))">👁️ 查看详情</button>
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function toggleAllPreview() {
+  const container = document.getElementById('allPlatformPreview');
+  const toggle = document.getElementById('allPreviewToggle');
+  if (container.style.display === 'none') {
+    container.style.display = 'block';
+    toggle.textContent = '（点击收起）';
+    updateAllPreview();
+  } else {
+    container.style.display = 'none';
+    toggle.textContent = '（点击展开）';
+  }
+}
+
+// ====== 平台切换 ======
+function selectPlatform(platform, btn) {
+  currentPlatform = platform;
+  document.querySelectorAll('.platform-tab').forEach(b => {
+    b.classList.remove('active', 'xiaohongshu', 'pengyouquan', 'meituan', 'dianping', 'douyin');
+  });
+  if (btn) {
+    btn.classList.add('active');
+    btn.classList.add(platform);
+  }
+  renderContentCards();
+}
+
+// ====== 当前平台操作 ======
+function copyCurrentPlatform() {
+  const text = allContent[currentPlatform];
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`已复制${platformStyles[currentPlatform].name}文案到剪贴板`);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(`已复制${platformStyles[currentPlatform].name}文案到剪贴板`);
+  });
+}
+
+function regenerateCurrentPlatform() {
+  allContent[currentPlatform] = generateContent(currentScene, currentPlatform);
+  renderContentCards();
+  showToast(`已刷新${platformStyles[currentPlatform].name}文案`);
+}
+
+function copyAllPlatform(platform) {
+  const text = allContent[platform];
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`已复制${platformStyles[platform].name}文案`);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(`已复制${platformStyles[platform].name}文案`);
+  });
+}
+
+function generateAllPlatforms() {
+  const platforms = ['xiaohongshu', 'pengyouquan', 'meituan', 'dianping', 'douyin'];
+  platforms.forEach(p => {
+    allContent[p] = generateContent(currentScene, p);
+  });
+  renderContentCards();
+  // 自动展开全部预览
+  const container = document.getElementById('allPlatformPreview');
+  if (container.style.display === 'none') {
+    toggleAllPreview();
+  } else {
+    updateAllPreview();
+  }
+  showToast('已为全部平台生成文案');
+}
+
+// ====== 图片管理面板 ======
+function renderPhotoStats() {
+  const photos = getPhotos();
+  const total = photos.length;
+  const stats = {};
+  photoCategories.forEach(c => { stats[c] = photos.filter(p => p.cat === c).length; });
+  stats.uncat = photos.filter(p => !p.cat || !photoCategories.includes(p.cat)).length;
+
+  let html = '';
+  html += `<div class="stat-item"><div class="stat-num">${total}</div><div class="stat-label">全部照片</div></div>`;
+  photoCategories.forEach(c => {
+    html += `<div class="stat-item"><div class="stat-num">${stats[c]}</div><div class="stat-label">${categoryLabels[c]}</div></div>`;
+  });
+  if (stats.uncat > 0) {
+    html += `<div class="stat-item"><div class="stat-num">${stats.uncat}</div><div class="stat-label">${categoryLabels.uncat}</div></div>`;
+  }
+  document.getElementById('photoStats').innerHTML = html;
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photoGrid');
+  const photos = getPhotos();
+  let filtered = photos;
+  if (currentPhotoFilter !== 'all') {
+    if (currentPhotoFilter === 'uncat') {
+      filtered = photos.filter(p => !p.cat || !photoCategories.includes(p.cat));
+    } else {
+      filtered = photos.filter(p => p.cat === currentPhotoFilter);
+    }
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2);">该分类下暂无照片</div>`;
+    updateSelectedCount();
+    return;
+  }
+
+  let html = '';
+  const catOptions = [
+    { value: 'room', label: '🏠 包间' },
+    { value: 'table', label: '🀄 麻将桌' },
+    { value: 'window', label: '🪟 大窗' },
+    { value: 'corridor', label: '🚪 走廊' },
+    { value: 'front', label: '🏢 前台' }
+  ];
+
+  filtered.forEach((ph, idx) => {
+    const isSelected = selectedPhotos.has(ph.file);
+    const currentCat = ph.cat || '';
+    const selectOptions = catOptions.map(opt =>
+      `<option value="${opt.value}"${currentCat === opt.value ? ' selected' : ''}>${opt.label}</option>`
+    ).join('');
+
+    html += `
+      <div class="photo-item${isSelected ? ' selected' : ''}" onclick="togglePhotoSelect('${ph.file}', event)" data-file="${ph.file}">
+        <div class="check-mark">✓</div>
+        <img src="xq-photos/${ph.file}" alt="${ph.cat}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22140%22><rect fill=%22%23333%22 width=%22200%22 height=%22140%22/><text fill=%22%23999%22 x=%22100%22 y=%2270%22 text-anchor=%22middle%22 font-size=%2214%22>图片加载失败</text></svg>'">
+        <div class="photo-label">
+          <div class="cat-row">
+            <span>${ph.file.length > 20 ? ph.file.substring(0, 18) + '...' : ph.file.replace('微信图片_', '').replace(/_74.jpg/, '')}</span>
+            <span class="cat-tag">${categoryLabels[ph.cat] || '未分类'}</span>
+          </div>
+          <select class="cat-select" onclick="event.stopPropagation()" onchange="changePhotoCategory('${ph.file}', this.value)">
+            <option value="">-- 分类 --</option>
+            ${selectOptions}
+          </select>
+        </div>
+      </div>`;
+  });
+  grid.innerHTML = html;
+  updateSelectedCount();
+}
+
+function filterPhotos(filter, btn) {
+  document.querySelectorAll('.photo-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPhotoFilter = filter;
+  selectedPhotos.clear();
+  const batchSel = document.getElementById('batchCatSelect');
+  if (batchSel) batchSel.value = '';
+  renderPhotoGrid();
+}
+
+function togglePhotoSelect(file, event) {
+  if (event.target.closest('.photo-item') && !event.target.closest('.match-photo-thumb')) {
+    // 检查是否点击了图片本身（用于预览）
+    const photoItem = event.target.closest('.photo-item');
+    if (photoItem && event.target.tagName === 'IMG') {
+      const src = event.target.src;
+      const catLabel = photoItem.querySelector('.cat-tag')?.textContent || '未分类';
+      openPhotoDetail(src, catLabel, file);
+      return;
+    }
+    // 如果点击了select或photo-label区域，不做选择操作
+    if (event.target.tagName === 'SELECT' || event.target.closest('.cat-select')) {
+      return;
+    }
+  }
+
+  if (selectedPhotos.has(file)) {
+    selectedPhotos.delete(file);
+  } else {
+    selectedPhotos.add(file);
+  }
+  renderPhotoGrid();
+}
+
+function selectAllPhotos() {
+  const photos = getPhotos();
+  let filtered = photos;
+  if (currentPhotoFilter !== 'all') {
+    if (currentPhotoFilter === 'uncat') {
+      filtered = photos.filter(p => !p.cat || !photoCategories.includes(p.cat));
+    } else {
+      filtered = photos.filter(p => p.cat === currentPhotoFilter);
+    }
+  }
+  filtered.forEach(p => selectedPhotos.add(p.file));
+  renderPhotoGrid();
+}
+
+function deselectAllPhotos() {
+  selectedPhotos.clear();
+  renderPhotoGrid();
+}
+
+function updateSelectedCount() {
+  document.getElementById('selectedCount').textContent = `已选 ${selectedPhotos.size} 张`;
+}
+
+function openPhotoDetail(src, label, file) {
+  document.getElementById('photoDetailImg').src = src;
+  const infoDiv = document.getElementById('photoDetailInfo');
+  const catOptions = [
+    { value: 'room', label: '🏠 包间环境' },
+    { value: 'table', label: '🀄 麻将桌' },
+    { value: 'window', label: '🪟 大窗' },
+    { value: 'corridor', label: '🚪 走廊' },
+    { value: 'front', label: '🏢 前台' }
+  ];
+  const photos = getPhotos();
+  const photo = file ? photos.find(p => p.file === file) : null;
+  const currentCat = photo ? (photo.cat || '') : '';
+  const selectOptions = catOptions.map(opt =>
+    `<option value="${opt.value}"${currentCat === opt.value ? ' selected' : ''}>${opt.label}</option>`
+  ).join('');
+  infoDiv.innerHTML = `
+    <span>${label}</span>
+    <select class="detail-select" onchange="changePhotoCategoryFromDetail('${file || ''}', this.value)">
+      <option value="">-- 改分类 --</option>
+      ${selectOptions}
+    </select>
+  `;
+  document.getElementById('photoOverlay').dataset.currentFile = file || '';
+  document.getElementById('photoOverlay').classList.add('show');
+}
+
+function changePhotoCategoryFromDetail(file, newCat) {
+  if (!file || !newCat) return;
+  changePhotoCategory(file, newCat);
+  // 更新overlay显示
+  const catOptions = [
+    { value: 'room', label: '🏠 包间环境' },
+    { value: 'table', label: '🀄 麻将桌' },
+    { value: 'window', label: '🪟 大窗' },
+    { value: 'corridor', label: '🚪 走廊' },
+    { value: 'front', label: '🏢 前台' }
+  ];
+  const selectedLabel = catOptions.find(o => o.value === newCat)?.label || newCat;
+  document.getElementById('photoDetailInfo').querySelector('span').textContent = selectedLabel;
+}
+
+function closePhotoDetail() {
+  document.getElementById('photoOverlay').classList.remove('show');
+}
+
+// 照片分类变更
+function changePhotoCategory(file, newCat) {
+  if (!newCat) return;
+  const photos = getPhotos();
+  const photo = photos.find(p => p.file === file);
+  if (photo) {
+    photo.cat = newCat;
+    savePhotos(photos);
+    renderPhotoGrid();
+    renderPhotoStats();
+    showToast(`已移至「${categoryLabels[newCat]}」`);
+  }
+}
+
+// 批量改分类
+function batchChangeCategory(newCat) {
+  if (!newCat || selectedPhotos.size === 0) {
+    document.getElementById('batchCatSelect').value = '';
+    if (selectedPhotos.size === 0) showToast('请先选择照片');
+    return;
+  }
+  const photos = getPhotos();
+  let changed = 0;
+  photos.forEach(p => {
+    if (selectedPhotos.has(p.file)) {
+      p.cat = newCat;
+      changed++;
+    }
+  });
+  savePhotos(photos);
+  selectedPhotos.clear();
+  document.getElementById('batchCatSelect').value = '';
+  renderPhotoGrid();
+  renderPhotoStats();
+  showToast(`已批量将 ${changed} 张照片移至「${categoryLabels[newCat]}」`);
+}
+
+// ====== 上传照片 ======
+function handleFileUpload(files) {
+  const photos = getPhotos();
+  let added = 0;
+  Array.from(files).forEach(file => {
+    if (!file.type.match(/image\/(jpeg|png|webp)/)) return;
+    const newName = 'uploaded_' + Date.now() + '_' + file.name;
+    // 保存为data URL用于预览
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      photos.push({ file: newName, cat: 'uncat', dataUrl: e.target.result });
+      savePhotos(photos);
+      if (added === 0) {
+        renderPhotoGrid();
+        renderPhotoStats();
+      }
+    };
+    reader.readAsDataURL(file);
+    added++;
+  });
+  if (added > 0) {
+    showToast(`已添加 ${added} 张新照片`);
+  }
+}
+
+// ====== 文案操作（旧接口保留兼容） ======
+function regenerateOne(platform) {
+  allContent[platform] = generateContent(currentScene, platform);
+  if (platform === currentPlatform) renderContentCards();
+  showToast(`已为${platformStyles[platform].name}生成新文案`);
+}
+function regenerateCurrent() {
+  const platforms = ['xiaohongshu', 'pengyouquan', 'meituan', 'dianping', 'douyin'];
+  platforms.forEach(p => { allContent[p] = generateContent(currentScene, p); });
+  renderContentCards();
+  showToast('已刷新全部文案');
+}
+function generateAll() {
+  const platforms = ['xiaohongshu', 'pengyouquan', 'meituan', 'dianping', 'douyin'];
+  platforms.forEach(p => { allContent[p] = generateContent(currentScene, p); });
+  renderContentCards();
+  showToast('已为全部平台生成今日文案');
+}
+
+function selectScene(btn, scene) {
+  document.querySelectorAll('#sceneTags .quick-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  currentScene = scene;
+  // 重新生成全部平台内容
+  const platforms = ['xiaohongshu', 'pengyouquan', 'meituan', 'dianping', 'douyin'];
+  platforms.forEach(p => { allContent[p] = generateContent(currentScene, p); });
+  renderContentCards();
+}
+
+// ====== 日历 ======
+const calendarData = {
+  1: '🎉 月初开门红\n推周末预订福利', 2: '📸 拍包间环境照\n发小红书种草',
+  3: '🀄 周末预热\n"周末约牌"文案', 4: '🎊 周末特惠\n包间预订引流',
+  5: '☀️ 周日休闲\n推下午场优惠', 6: '💎 老客回馈\n会员日文案',
+  7: '📋 点评回复\n维护好评', 8: '🌧️ 天气借势\n"太热来搓麻"',
+  9: '📸 新设备展示\n拍麻将特写', 10: '🀄 周末预热\n推包间预订',
+  11: '🎉 周末促销\n限时优惠', 12: '☀️ 周日套餐\n畅打活动',
+  13: '🆕 新客引流\n首单优惠', 14: '💎 老客维护\n感谢文案',
+  15: '📸 环境展示\n停车方便亮点', 16: '🌙 夜场推广\n凌晨营业',
+  17: '🀄 周末预热\n约牌文案', 18: '🎊 周末特惠\n满减活动',
+  19: '☀️ 周日休闲\n下午场', 20: '📋 客户评价\n引导好评',
+  21: '🆕 新客体验\n免费茶水', 22: '🌧️ 天气借势\n空调包间',
+  23: '📸 包间展示\n独立私密', 24: '🀄 周末预热\n预订从速',
+  25: '🎉 周末大促\n充值优惠', 26: '☀️ 周日特惠\n畅打包',
+  27: '💎 会员福利\n积分兑换', 28: '📋 月末复盘\n感谢顾客',
+  29: '🆕 下月活动预告\n提前预热', 30: '📸 月度环境展示\n焕然一新',
+  31: '🎊 月末收官\n周末大促'
+};
+
+function renderCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  const today = new Date();
+  const todayDate = today.getDate();
+  let html = '';
+  ['日','一','二','三','四','五','六'].forEach(d => {
+    html += `<div style="text-align:center;font-size:12px;color:var(--text2);padding:8px;">${d}</div>`;
+  });
+  const firstDay = new Date(2026, 6, 1).getDay();
+  for (let i = 0; i < firstDay; i++) html += '<div class="calendar-day empty"></div>';
+  for (let d = 1; d <= 31; d++) {
+    const isToday = d === todayDate;
+    const hint = calendarData[d] || '';
+    html += `<div class="calendar-day${isToday ? ' today' : ''}" onclick="generateDayContent(${d})" title="点击生成当天内容">
+      <div class="date">7月${d}日${isToday ? ' 📍' : ''}</div>
+      <div class="content-hint">${hint.replace(/\n/g, '<br>')}</div>
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function generateDayContent(day) {
+  currentScene = 'daily';
+  if (day === 11 || day === 18 || day === 25) currentScene = 'weekend';
+  if (day === 13 || day === 21) currentScene = 'new';
+  if (day === 6 || day === 14 || day === 27) currentScene = 'old';
+  if (day === 8 || day === 22) currentScene = 'weather';
+  if (day === 9 || day === 15 || day === 23 || day === 30) currentScene = 'show';
+  document.querySelectorAll('#sceneTags .quick-btn').forEach(b => {
+    b.classList.remove('selected');
+    if (b.textContent.includes(sceneConfig[currentScene].label.substring(0, 2))) b.classList.add('selected');
+  });
+  renderContentCards();
+  switchTab('generate', document.querySelector('.tab-btn:nth-child(1)'));
+  showToast(`已生成7月${day}日专属内容`);
+}
+
+// ====== 模板库 ======
+const templateLibrary = [
+  { scene: '日常揽客', platform: 'meituan', content: `🏠 翔安环境最好的棋牌室\n\n【喜鹊茶馆】—— 您身边的品质棋牌空间\n\n✅ 独立包间，私密舒适\n✅ 全新麻将设备，手感一流\n✅ 路边公共停车位，免费停车\n✅ 24小时营业，随时来搓\n✅ 茶水小吃免费供应\n\n📍 金海街道淞源里10-103号（国贸沁原1期东门）\n📞 18030105880\n\n订位请私信或致电~` },
+  { scene: '新客引流', platform: 'xiaohongshu', content: `翔安这家棋牌室也太适合社恐了吧！😭\n\n第一次去棋牌室超紧张？来喜鹊茶馆完全不用担心！\n\n💡 独立包间，只有你和朋友\n💡 新设备新麻将，手感好到爆\n💡 路边免费停车，不用找车位\n💡 24小时营业，随时来\n💡 服务超贴心，茶水随时续\n\n适合闺蜜局、兄弟局、家庭局👨‍👩‍👧‍👦\n\n📍 翔安·国贸沁原1期东门附近\n\n#翔安棋牌室 #厦门麻将 #棋牌室推荐` },
+  { scene: '老客维护', platform: 'pengyouquan', content: `致喜鹊茶馆的老朋友们：\n\n感谢大家一直以来的支持！每次看到熟悉的包间亮着灯，就觉得特别温暖。\n\n这个月我们做了一些小升级：\n✨ 麻将全部换新\n✨ 包间重新布置\n✨ 新增免费茶饮\n\n有空就回来搓一把，老地方，老味道。\n\n📍 金海街道淞源里10-103号\n📞 18030105880\n\n——喜鹊茶馆` },
+  { scene: '天气借势', platform: 'meituan', content: `🌧️ 下雨天去哪儿？来搓麻将啊！\n\n外面下雨，里面温暖。\n喜鹊茶馆的包间空调开好了，\n麻将洗好了，茶水泡好了，\n就差你来了。\n\n🅿️ 路边公共停车位，免费停车\n🏠 独立包间，听着雨声搓麻将别有一番滋味\n🕐 24小时营业\n\n📍 金海街道淞源里10-103号\n📞 18030105880` }
+];
+
+function renderTemplates() {
+  const container = document.getElementById('templateList');
+  let html = '';
+  templateLibrary.forEach((tpl, i) => {
+    const pStyle = platformStyles[tpl.platform] || platformStyles.meituan;
+    html += `<div class="content-card" style="margin-bottom:12px;">
+      <div class="card-header">
+        <span style="font-size:13px;color:var(--accent);font-weight:600;">${tpl.scene}</span>
+        <span class="platform-badge ${pStyle.badgeClass}">${pStyle.name}</span>
+      </div>
+      <div class="card-body">${tpl.content}</div>
+      <div class="card-actions">
+        <button class="btn btn-primary btn-sm" onclick="copyTemplate(${i})">📋 复制使用</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function copyTemplate(i) {
+  navigator.clipboard.writeText(templateLibrary[i].content).then(() => showToast('已复制模板到剪贴板'));
+}
+
+// ====== 面板切换 ======
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'calendar') renderCalendar();
+  if (tab === 'templates') renderTemplates();
+  if (tab === 'photos') { renderPhotoStats(); renderPhotoGrid(); }
+}
+
+// ====== 设置 ======
+function loadSettings() {
+  const saved = localStorage.getItem('xiQue_settings');
+  if (saved) {
+    const s = JSON.parse(saved);
+    Object.assign(shopInfo, s);
+    document.getElementById('shopName').value = shopInfo.name;
+    document.getElementById('shopLocation').value = shopInfo.location;
+    document.getElementById('shopFeatures').value = shopInfo.features.join(',');
+    document.getElementById('shopAddress').value = shopInfo.address || '';
+    document.getElementById('shopHours').value = shopInfo.hours;
+    document.getElementById('shopPhone').value = shopInfo.phone || '';
+    document.getElementById('customEvent').value = shopInfo.customEvent || '';
+  }
+}
+
+function saveSettings() {
+  shopInfo.name = document.getElementById('shopName').value;
+  shopInfo.location = document.getElementById('shopLocation').value;
+  shopInfo.features = document.getElementById('shopFeatures').value.split(',').map(s => s.trim()).filter(Boolean);
+  shopInfo.address = document.getElementById('shopAddress').value;
+  shopInfo.hours = document.getElementById('shopHours').value;
+  shopInfo.phone = document.getElementById('shopPhone').value;
+  shopInfo.customEvent = document.getElementById('customEvent').value;
+  localStorage.setItem('xiQue_settings', JSON.stringify(shopInfo));
+  document.getElementById('shopInfoBar').innerHTML = `
+    <span class="tag"><span class="icon">📍</span> ${shopInfo.address || shopInfo.location}</span>
+    <span class="tag"><span class="icon">🕐</span> ${shopInfo.hours}</span>
+    <span class="tag"><span class="icon">🅿️</span> 路边公共停车位·免费</span>
+    <span class="tag"><span class="icon">📞</span> ${shopInfo.phone || '未设置'}</span>
+  `;
+  renderContentCards();
+  showToast('设置已保存，文案已更新');
+}
+
+// ====== Toast ======
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ====== 初始化 ======
+function init() {
+  loadSettings();
+  // 预生成全部平台内容
+  const platforms = ['xiaohongshu', 'pengyouquan', 'meituan', 'dianping', 'douyin'];
+  platforms.forEach(p => { allContent[p] = generateContent(currentScene, p); });
+  renderContentCards();
+
+  // 上传区域
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  uploadZone.addEventListener('click', () => fileInput.click());
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = 'var(--accent)'; });
+  uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = 'var(--border)'; });
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.style.borderColor = 'var(--border)';
+    handleFileUpload(e.dataTransfer.files);
+  });
+  fileInput.addEventListener('change', e => { handleFileUpload(e.target.files); fileInput.value = ''; });
+
+  // ESC关闭大图
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhotoDetail(); });
+}
+
+init();
+</script>
+</body>
+</html>
